@@ -1,4 +1,5 @@
 package com.example.restservice;
+import java.sql.Date;
 import java.time.LocalDate;
 
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -16,6 +17,14 @@ public class Post implements Comparable<Post> {
         this.likes = 0;
         this.date = java.time.LocalDate.now();
         this.rank=0;
+    }
+
+    public Post(long id, String text, int likes, Date date, double rank) {
+        this.id = id;
+        this.text = text;
+        this.likes = likes;
+        this.date = date.toLocalDate();
+        this.rank=rank;
     }
 
     public void updateRank(){

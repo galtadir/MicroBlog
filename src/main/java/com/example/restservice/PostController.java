@@ -10,8 +10,8 @@ import java.util.concurrent.atomic.AtomicLong;
 @RestController
 public class PostController {
 
-    private final AtomicLong counter = new AtomicLong();
     private PostDBManager dbManager = PostDBManager.getPostManger();
+    private final AtomicLong counter = new AtomicLong(dbManager.getNextId());
 
     @PostMapping("/post")
     public Post createPost(@RequestBody CreateRequest params){
