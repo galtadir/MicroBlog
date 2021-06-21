@@ -10,9 +10,12 @@ import java.util.concurrent.atomic.AtomicLong;
 @RestController
 public class PostController {
 
+    //get DB Manager as single tone
     private PostDBManager dbManager = PostDBManager.getPostManger();
+    // responsible to assign unique id
     private final AtomicLong counter = new AtomicLong(dbManager.getNextId());
 
+    // create new post
     @PostMapping("/post")
     public Post createPost(@RequestBody CreateRequest params){
         Post newPost =  new Post(counter.incrementAndGet(),params.getText());
@@ -20,6 +23,7 @@ public class PostController {
         return newPost;
     }
 
+    // change the text of specific post
     @PatchMapping("/post/{id}")
     public Post updatePost(@PathVariable Long id,@RequestBody UpdateRequest params){
         Post post = dbManager.updateText(id,params.getText());
@@ -29,6 +33,7 @@ public class PostController {
         return post;
     }
 
+    // delete specific post by id
     @DeleteMapping("/post/{id}")
     public void deletePost(@PathVariable Long id){
         boolean deleted = dbManager.deletePost(id);
@@ -38,6 +43,7 @@ public class PostController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found");
     }
 
+    //return specific post by id
     @GetMapping("/post/{id}")
     public Post getPost(@PathVariable Long id){
         Post post = dbManager.getPost(id);
@@ -47,6 +53,7 @@ public class PostController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found");
     }
 
+    //add like to post
     @PostMapping("/post/{id}/like")
     public Post likePost(@PathVariable Long id){
         Post post = dbManager.likePost(id);
@@ -56,7 +63,7 @@ public class PostController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found");
     }
 
-
+    //return top n trending posts
     @GetMapping("/post/trending/{n}")
     public List<Post> getPost(@PathVariable int n){
         return dbManager.getMostRelevant(n);

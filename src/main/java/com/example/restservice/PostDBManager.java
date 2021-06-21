@@ -7,6 +7,7 @@ import java.util.List;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
+//single tone class
 class PostDBManager {
     private static PostDBManager postDBManager;
     private LocalDate lastRankUpdate;
@@ -35,6 +36,7 @@ class PostDBManager {
         return postDBManager;
     }
 
+    //insert post to the db
     boolean AddPost(Post post){
         boolean insert= false;
         try {
@@ -55,6 +57,7 @@ class PostDBManager {
         return insert;
     }
 
+    //update text for specific post
     Post updateText(Long id, String text){
         String query="UPDATE posts SET text = (?) WHERE id=(?)";
         try {
@@ -69,6 +72,7 @@ class PostDBManager {
         return getPost(id);
     }
 
+    //remove post from the db
     boolean deletePost(long id){
 
         if(getPost(id)==null){
@@ -86,6 +90,7 @@ class PostDBManager {
 
     }
 
+    //return post from the db
     Post getPost(long id){
         Post post = null;
         try {
@@ -104,6 +109,7 @@ class PostDBManager {
 
     }
 
+    //add like to post
     Post likePost(long id){
         Post post = getPost(id);
         if(post==null){
@@ -123,9 +129,11 @@ class PostDBManager {
 
     }
 
+    //return top n trending posts
     List<Post> getMostRelevant(int n){
-
+        //if the rank of all posts not update today then update them all
         if(DAYS.between(lastRankUpdate, java.time.LocalDate.now())!=0){
+            //the rank will be the amount of likes minus 10% foreach day
             String query="UPDATE posts SET `rank` = likes*pow(0.9,DATEDIFF(`date`,(?)))";
             try {
                 PreparedStatement st= con.prepareStatement(query);
@@ -138,6 +146,7 @@ class PostDBManager {
             lastRankUpdate = java.time.LocalDate.now();
         }
         try {
+            //return the most trending post in corresponded order
             String query = "SELECT * FROM  posts ORDER BY `rank` DESC LIMIT " + n;
             PreparedStatement st = con.prepareStatement(query);
             ResultSet rows = st.executeQuery();
@@ -156,8 +165,8 @@ class PostDBManager {
 
     }
 
+    //check the last id updated in db and return him
     int getNextId(){
-
         try {
             int max = 0;
             String query = "SELECT MAX(id) AS maxid  FROM  posts";
