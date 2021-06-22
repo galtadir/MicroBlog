@@ -20,13 +20,38 @@ class PostDBManager {
         String user="root";
         String  password="1234";
 
+//        String url=System.getenv("MYSQL_URL");
+//        String user=System.getenv("MYSQL_USER");
+//        String  password=System.getenv("MYSQL_PASSWORD");
+//        System.out.println(url);
+//        System.out.println(user);
+//        System.out.println(password);
+
+//        String url="jdbc:mysql://appN_db:3307/java_to_dev_app_db";
+//        String user="java_to_dev";
+//        String  password= "nE5kMc7JCGNqwDQM";
+
+
         try{
             Class.forName("com.mysql.jdbc.Driver");
             con = DriverManager.getConnection(url,user,password);
+            createPostsTable();
 
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    boolean createPostsTable(){
+        try {
+            String query = "CREATE TABLE IF NOT EXISTS posts (`id` Long NOT NULL, `text` VARCHAR(255) NOT NULL, `likes` INTEGER NOT NULL, date DATE NOT NULL, `rank` Double NOT NULL)";
+            PreparedStatement st = con.prepareStatement(query);
+            st.executeUpdate();
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+
     }
 
     static PostDBManager getPostManger(){
