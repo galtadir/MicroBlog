@@ -14,7 +14,7 @@ class PostDBManager {
     private Connection con;
 
     private PostDBManager(){
-        lastRankUpdate = java.time.LocalDate.now();
+//        lastRankUpdate = java.time.LocalDate.now();
 
         String url="jdbc:mysql://localhost:3306/posts-db";
         String user="root";
@@ -44,7 +44,7 @@ class PostDBManager {
 
     boolean createPostsTable(){
         try {
-            String query = "CREATE TABLE IF NOT EXISTS posts (`id` Long NOT NULL, `text` VARCHAR(255) NOT NULL, `likes` INTEGER NOT NULL, date DATE NOT NULL, `rank` Double NOT NULL)";
+            String query = "CREATE TABLE IF NOT EXISTS posts (`id` Long NOT NULL, `text` VARCHAR(255) NOT NULL, `likes` INTEGER NOT NULL, `date` DATE NOT NULL, `rank` Double NOT NULL)";
             PreparedStatement st = con.prepareStatement(query);
             st.executeUpdate();
             return true;
@@ -63,7 +63,6 @@ class PostDBManager {
 
     //insert post to the db
     boolean AddPost(Post post){
-        boolean insert= false;
         try {
             String query = "INSERT INTO posts values (?,?,?,?,?)";
             PreparedStatement st = con.prepareStatement(query);
@@ -74,12 +73,12 @@ class PostDBManager {
             st.setDouble(5,post.getRank());
             int rows = st.executeUpdate();
             if (rows > 0) {
-                insert = true;
+                return false;
             }
         }catch (Exception e){
             return false;
         }
-        return insert;
+        return false;
     }
 
     //update text for specific post
@@ -99,7 +98,6 @@ class PostDBManager {
 
     //remove post from the db
     boolean deletePost(long id){
-
         if(getPost(id)==null){
             return false;
         }
@@ -157,7 +155,7 @@ class PostDBManager {
     //return top n trending posts
     List<Post> getMostRelevant(int n){
         //if the rank of all posts not update today then update them all
-        if(DAYS.between(lastRankUpdate, java.time.LocalDate.now())!=0){
+        if( lastRankUpdate==null || DAYS.between(lastRankUpdate, java.time.LocalDate.now())!=0){
             //the rank will be the amount of likes minus 10% foreach day
             String query="UPDATE posts SET `rank` = likes*pow(0.9,DATEDIFF(`date`,(?)))";
             try {

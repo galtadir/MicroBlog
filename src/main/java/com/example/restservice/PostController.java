@@ -19,8 +19,10 @@ public class PostController {
     @PostMapping("/post")
     public Post createPost(@RequestBody CreateRequest params){
         Post newPost =  new Post(counter.incrementAndGet(),params.getText());
-        dbManager.AddPost(newPost);
-        return newPost;
+        if(dbManager.AddPost(newPost)){
+            return newPost;
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
     // change the text of specific post

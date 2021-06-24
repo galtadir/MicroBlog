@@ -4,10 +4,10 @@ services:
     image: mysql
     restart: always
     environment:
-      MYSQL_DATABASE: posts-db
-      MYSQL_USER: java_to_dev
-      MYSQL_PASSWORD: nE5kMc7JCGNqwDQM
-      MYSQL_ROOT_PASSWORD: nE5kMc7JCGNqwDQN
+      MYSQL_DATABASE: posts_db
+      MYSQL_USER: gal
+      MYSQL_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: 1234
     ports:
       - "3307:3307"
   rest-service:
@@ -16,9 +16,9 @@ services:
     depends_on:
       - db
     environment:
-      MYSQL_URL: jdbc:mysql://db:3307/posts-db
-      MYSQL_USER: java_to_dev
-      MYSQL_PASSWORD: nE5kMc7JCGNqwDQM
+      MYSQL_URL: jdbc:mysql://db:3307/posts_db
+      MYSQL_USER: gal
+      MYSQL_PASSWORD: 1234
     ports:
       - "8080:8080"
 volumes:
