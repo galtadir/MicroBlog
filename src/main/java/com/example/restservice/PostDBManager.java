@@ -14,32 +14,27 @@ class PostDBManager {
     private Connection con;
 
     private PostDBManager(){
-//        lastRankUpdate = java.time.LocalDate.now();
+        connect();
+    }
 
-        String url="jdbc:mysql://localhost:3306/posts-db";
-        String user="root";
-        String  password="1234";
-
-//        String url=System.getenv("MYSQL_URL");
-//        String user=System.getenv("MYSQL_USER");
-//        String  password=System.getenv("MYSQL_PASSWORD");
-//        System.out.println(url);
-//        System.out.println(user);
-//        System.out.println(password);
-
-//        String url="jdbc:mysql://appN_db:3307/java_to_dev_app_db";
-//        String user="java_to_dev";
-//        String  password= "nE5kMc7JCGNqwDQM";
-
-
-        try{
-            Class.forName("com.mysql.jdbc.Driver");
-            con = DriverManager.getConnection(url,user,password);
-            createPostsTable();
-
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+    //create connection if not exist
+    private void connect(){
+        if(con==null){
+            String url=System.getenv("MYSQL_URL");
+            String user=System.getenv("MYSQL_USER");
+            String  password=System.getenv("MYSQL_PASSWORD");
+//            String url="jdbc:mysql://db:3307/posts_db";
+//            String user="gal";
+//            String  password= "1234";
+            try{
+                Class.forName("com.mysql.jdbc.Driver");
+                con = DriverManager.getConnection(url,user,password);
+                createPostsTable();
+            } catch (ClassNotFoundException | SQLException e) {
+//                e.printStackTrace();
+            }
         }
+
     }
 
     boolean createPostsTable(){
@@ -63,6 +58,7 @@ class PostDBManager {
 
     //insert post to the db
     boolean AddPost(Post post){
+        connect();
         try {
             String query = "INSERT INTO posts values (?,?,?,?,?)";
             PreparedStatement st = con.prepareStatement(query);
@@ -73,7 +69,7 @@ class PostDBManager {
             st.setDouble(5,post.getRank());
             int rows = st.executeUpdate();
             if (rows > 0) {
-                return false;
+                return true;
             }
         }catch (Exception e){
             return false;
@@ -83,6 +79,7 @@ class PostDBManager {
 
     //update text for specific post
     Post updateText(Long id, String text){
+        connect();
         String query="UPDATE posts SET text = (?) WHERE id=(?)";
         try {
             PreparedStatement st= con.prepareStatement(query);
@@ -98,6 +95,7 @@ class PostDBManager {
 
     //remove post from the db
     boolean deletePost(long id){
+        connect();
         if(getPost(id)==null){
             return false;
         }
@@ -115,6 +113,7 @@ class PostDBManager {
 
     //return post from the db
     Post getPost(long id){
+        connect();
         Post post = null;
         try {
             String query = "SELECT * FROM  posts WHERE id=" + id;
@@ -134,6 +133,7 @@ class PostDBManager {
 
     //add like to post
     Post likePost(long id){
+        connect();
         Post post = getPost(id);
         if(post==null){
             return null;
@@ -154,6 +154,7 @@ class PostDBManager {
 
     //return top n trending posts
     List<Post> getMostRelevant(int n){
+        connect();
         //if the rank of all posts not update today then update them all
         if( lastRankUpdate==null || DAYS.between(lastRankUpdate, java.time.LocalDate.now())!=0){
             //the rank will be the amount of likes minus 10% foreach day
@@ -190,6 +191,7 @@ class PostDBManager {
 
     //check the last id updated in db and return him
     int getNextId(){
+        connect();
         try {
             int max = 0;
             String query = "SELECT MAX(id) AS maxid  FROM  posts";
